@@ -3,7 +3,12 @@ package com.example.animations
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,7 +51,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AnimationApp(modifier: Modifier = Modifier) {
-    AnimateAsStateDemo(modifier)
+    Column(modifier.fillMaxSize().padding(16.dp)) {
+        AnimateAsStateDemo(modifier)
+        Spacer(modifier = modifier.height(16.dp))
+        UpdateTransitionDemo(modifier)
+    }
 }
 
 @Composable
@@ -54,15 +63,67 @@ fun AnimateAsStateDemo(modifier: Modifier) {
     var blue by remember { mutableStateOf(true) }
     val color by animateColorAsState(if (blue) Color.Blue else Color.Green)
 
-    Column(modifier) {
+    Column() {
         Button(onClick = { blue = !blue }) {
             Text(text = "CHANGE COLOR")
         }
         Spacer(modifier = Modifier.height(16.dp))
         Box(
             modifier = Modifier
-            .size(128.dp)
-            .background(color = color)
+                .size(128.dp)
+                .background(color = color)
+        )
+    }
+}
+
+private enum class BoxState {
+    SMALL,
+    LARGE
+}
+
+@Composable
+fun UpdateTransitionDemo(modifier: Modifier) {
+    var boxState by remember { mutableStateOf(BoxState.SMALL) }
+    val transition = updateTransition(targetState = boxState, label = "")
+    val color by transition.animateColor(label = "") { state ->
+        when (state) {
+            BoxState.SMALL -> Color.Blue
+            BoxState.LARGE -> Color.Magenta
+        }
+    }
+    val size by transition.animateDp(
+        label = "",
+        transitionSpec = {
+            if (targetState == BoxState.LARGE) spring(
+                dampingRatio = Spring.DampingRatioHighBouncy,
+                stiffness = Spring.StiffnessHigh
+                )
+            else spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessMedium
+            )
+        }
+        ) { state ->
+        when (state) {
+            BoxState.SMALL -> 64.dp
+            BoxState.LARGE -> 128.dp
+        }
+    }
+
+    Column() {
+        Button(onClick = {
+            boxState = when (boxState) {
+                BoxState.SMALL -> BoxState.LARGE
+                BoxState.LARGE -> BoxState.SMALL
+            }
+        }) {
+            Text(text = "CHANGE COLOR")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Box(
+            modifier = Modifier
+                .size(size)
+                .background(color = color)
         )
     }
 }
@@ -71,6 +132,6 @@ fun AnimateAsStateDemo(modifier: Modifier) {
 @Composable
 fun AnimationAppPreview() {
     AnimationsTheme {
-        AnimationApp(modifier = Modifier.fillMaxSize().padding(16.dp))
+        AnimationApp()
     }
 }
