@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.spring
@@ -29,8 +30,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.animations.ui.theme.AnimationsTheme
 
 class MainActivity : ComponentActivity() {
@@ -52,12 +56,18 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AnimationApp(modifier: Modifier = Modifier) {
-    Column(modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(16.dp)) {
         AnimateAsStateDemo(modifier)
         Spacer(modifier = modifier.height(16.dp))
         UpdateTransitionDemo(modifier)
         Spacer(modifier = modifier.height(16.dp))
         AnimateVisibilityDemo(modifier)
+        Spacer(modifier = modifier.height(16.dp))
+
+        AnimateContentSizeDemo(modifier)
     }
 }
 
@@ -145,6 +155,32 @@ fun AnimateVisibilityDemo(modifier: Modifier) {
                 modifier = Modifier
                     .size(128.dp)
                     .background(color = Color.DarkGray)
+            )
+        }
+    }
+}
+
+@Composable
+fun AnimateContentSizeDemo(modifier: Modifier) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column() {
+        Button(onClick = { expanded = !expanded }) {
+            Text(text = if (expanded) "SHRINK" else "EXPAND")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Box(
+                modifier = Modifier
+                    .background(color = Color.LightGray)
+                    .animateContentSize()
+            ) {
+            Text(
+                text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut justo nec felis rutrum posuere. Nulla ac lacinia magna. Cras consequat dictum nulla, ac venenatis eros consequat id. Vestibulum vel dapibus lorem. Sed tristique, turpis eu euismod mattis, odio libero tempor metus, a fermentum eros risus ut velit. Nulla facilisi. Suspendisse potenti. Integer aliquam ultrices lorem, sed vestibulum arcu pulvinar sit amet. Vivamus eleifend auctor tortor, eget lacinia erat sagittis eget. Sed commodo elit nec sapien scelerisque sodales. Curabitur convallis vestibulum neque, eu tempus lectus lacinia vel. In sollicitudin varius arcu, eu facilisis lectus gravida ut. Aliquam erat volutpat. Nullam vulputate nunc id magna fermentum, eget convallis arcu lacinia. Curabitur nec odio vitae tellus tincidunt convallis.",
+                fontSize = 16.sp,
+                textAlign = TextAlign.Justify,
+                color = Color.Black,
+                modifier = Modifier.padding(16.dp),
+                maxLines = if (expanded) Int.MAX_VALUE else 2
             )
         }
     }
