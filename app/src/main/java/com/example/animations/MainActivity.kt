@@ -3,6 +3,7 @@ package com.example.animations
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -55,6 +56,8 @@ fun AnimationApp(modifier: Modifier = Modifier) {
         AnimateAsStateDemo(modifier)
         Spacer(modifier = modifier.height(16.dp))
         UpdateTransitionDemo(modifier)
+        Spacer(modifier = modifier.height(16.dp))
+        AnimateVisibilityDemo(modifier)
     }
 }
 
@@ -125,6 +128,25 @@ fun UpdateTransitionDemo(modifier: Modifier) {
                 .size(size)
                 .background(color = color)
         )
+    }
+}
+
+@Composable
+fun AnimateVisibilityDemo(modifier: Modifier) {
+    var visible by remember { mutableStateOf(true) }
+
+    Column() {
+        Button(onClick = { visible = !visible }) {
+            Text(text = if (visible) "HIDE" else "SHOW")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        AnimatedVisibility (visible) {
+            Box(
+                modifier = Modifier
+                    .size(128.dp)
+                    .background(color = Color.DarkGray)
+            )
+        }
     }
 }
 
